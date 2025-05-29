@@ -1,0 +1,9 @@
+{
+    "file": "music_entropic.ogg",
+    "replace": "music1",
+    "loc_name": "My Cool Song loaded via metadata",
+    "pitch": 1,
+    "volune": 1,
+    "priority": 100000000,
+    "replace": "music1"
+}
