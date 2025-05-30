@@ -167,7 +167,7 @@ local play_ref = play_sound
 function play_sound(sound_code, ...)
 	if Penumbra.config.shuffle and SMODS.Sound.obj_table[sound_code] and (SMODS.Sound.obj_table[sound_code].replace or SMODS.Sound.obj_table[sound_code].select_music_track) then
 		G.SHUFFLE_COUNT = G.SHUFFLE_COUNT - 1
-		if G.SHUFFLE_COUNT < 1 then G.SHUFFLE_INDEX = nil
+		if G.SHUFFLE_COUNT < 1 then G.SHUFFLE_INDEX = nil end
 	end
 	play_ref(sound_code, ...)
 end
