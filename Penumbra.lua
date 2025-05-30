@@ -114,6 +114,9 @@ SMODS.Sound.get_current_music = function(self)
 	end
 	if #tbl < 1 then return nil end
 	if #tbl == 1 then return tbl[1][1] end
+	if not G.SHUFFLE_INDEX then
+		G.SHUFFLE_COUNT = 2
+	end
 	G.SHUFFLE_INDEX = G.SHUFFLE_INDEX or pseudorandom("shuffle_next_song", 1, #tbl)
 	if not Penumbra.config.shuffle then
 		G.SHUFFLE_INDEX = #tbl
@@ -163,7 +166,8 @@ Penumbra.LoadMusic()
 local play_ref = play_sound
 function play_sound(sound_code, ...)
 	if Penumbra.config.shuffle and SMODS.Sound.obj_table[sound_code] and (SMODS.Sound.obj_table[sound_code].replace or SMODS.Sound.obj_table[sound_code].select_music_track) then
-		G.SHUFFLE_INDEX = nil
+		G.SHUFFLE_COUNT = G.SHUFFLE_COUNT - 1
+		if G.SHUFFLE_COUNT < 1 then G.SHUFFLE_INDEX = nil
 	end
 	play_ref(sound_code, ...)
 end
