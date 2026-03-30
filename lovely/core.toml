@@ -28,3 +28,110 @@ payload = '''
 if not self.config.colour then self.config.colour = {1,0,0,1} end
 '''
 match_indent = true
+
+[[patches]] # Readds the debug info to v1.0.1g+ / show hud config
+[patches.pattern]
+target = "game.lua"
+pattern = '''timer_checkpoint('canvas', 'draw')'''
+position = "before"
+payload = '''
+if Penumbra.GCM() and not G.SETTINGS.paused and Penumbra.config.info then
+    local key = Penumbra.GCM(true)
+    if Penumbra.last_disp_key ~= key then
+        Penumbra.display_track()
+        Penumbra.last_disp_key = key
+    end
+    if Penumbra.loc_authors[Penumbra.GCM()] then
+        love.graphics.print(string.format("Now Playing: %s\n      - %s", Penumbra.GCM(true), Penumbra.loc_authors[Penumbra.GCM()]), G.LOADING.font, Penumbra.nowplaying_xoff or -1000, -80 + love.graphics.getHeight() / 2, 0, 2, 2)
+    else
+        love.graphics.print(string.format("Now Playing: %s", Penumbra.GCM(true)), G.LOADING.font, Penumbra.nowplaying_xoff or -1000, -80 + love.graphics.getHeight() / 2, 0, 2, 2)
+    end
+end
+'''
+match_indent = true
+overwrite = false
+
+[[patches]]
+[patches.pattern]
+target = '''engine/event.lua'''
+pattern = '''        other = {}'''
+position = "after"
+payload = ''',
+pbra_other = {}
+'''
+match_indent = true
+
+# Add event scenario description for the collection
+[[patches]]
+[patches.pattern]
+target = '''functions/common_events.lua'''
+pattern = '''if first_pass and not (_c.set == 'Edition') and badges then'''
+position = 'before'
+payload = '''
+if first_pass and card and card.pbra_jukebox_none then
+  info_queue[#info_queue+1] = { key = "pbra_no_track", set = "Other" }
+elseif first_pass and card and card.pbra_jukebox_key then
+  local event = PBJukebox.Music[card.pbra_jukebox_key]
+  local t = { key = card.pbra_jukebox_key, set = 'pbra_jukebox' }
+  local res = {}
+  if event.discoverable and not event.discovered then
+    t = { key = "pbra_undiscovered_track", set = "Other" }
+  end
+  if event.collection_loc_vars and type(event.collection_loc_vars) == 'function' then
+    res = event:collection_loc_vars(info_queue) or {}
+    t.vars = res.vars or {}
+    t.key = res.key or t.key
+    t.set = res.set or t.set
+  end
+  info_queue[#info_queue+1] = t
+end
+'''
+match_indent = true
+
+# Add EventScenarios as a set to be localized here
+[[patches]]
+[patches.pattern]
+target = '''functions/common_events.lua'''
+pattern = '''if _c.set == 'Other' then
+        localize{type = 'other', key = _c.key, nodes = desc_nodes, vars = specific_vars or _c.vars}'''
+position = 'after'
+payload = '''
+elseif _c.set == 'pbra_jukebox' then
+    localize{type = 'descriptions', key = _c.key, set = _c.set, nodes = desc_nodes, vars = specific_vars or _c.vars}
+'''
+match_indent = true
+
+# Add Event badge
+[[patches]]
+[patches.pattern]
+target = '''functions/UI_definitions.lua'''
+pattern = '''if AUT.badges then'''
+position = 'before'
+payload = '''
+if card.pbra_jukebox_key and not card.pbra_jukebox_none then
+  local tag = PBJukebox.Music[card.pbra_jukebox_key]
+  if not (tag.discoverable and not tag.discovered) then
+    SMODS.create_mod_badges(PBJukebox.Music[card.pbra_jukebox_key], badges)
+  end
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = '''=[SMODS _ "src/card_draw.lua"]'''
+pattern = '''
+-- for all hover/tilting:
+'''
+position = 'before'
+payload = '''
+if self.no_tilt then
+  self.tilt_var = {
+    mx = (0.5*self.VT.w+self.VT.x+G.ROOM.T.x)*G.TILESIZE*G.TILESCALE, 
+    my = (0.5*self.VT.h+self.VT.y+G.ROOM.T.y)*G.TILESIZE*G.TILESCALE, 
+    amt = 0, dx = 0, dy = 0
+  }
+  return
+end
+'''
+match_indent = true

@@ -7,7 +7,7 @@
     "prefix": "pbra",
     "author": ["Ruby"],
     "main_file": "Penumbra.lua",
-    "priority": 0,
+    "priority": -10000,
     "badge_colour": "FE0001",
     "dependencies": [
     ],
