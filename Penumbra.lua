@@ -368,7 +368,7 @@ function Penumbra.get_artist(key, tag)
 	if not SMODS.Sounds[key] then	
 		return "LouisF"
 	end
-	return Penumbra.loc_authors[key] or tag.artist or "???"
+	return Penumbra.loc_authors[key] or "???"
 end
 function Penumbra.get_name(key, tag)
 	return (Penumbra.loc_names[key] or (Penumbra.loc_keys[key] and localize(Penumbra.loc_keys[key]))) or tag.title or key or ""
