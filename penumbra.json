@@ -1,0 +1,16 @@
+{
+    "name": "Penumbra",
+    "id": "pbra",
+    "version": "1.1.1",
+    "website_url": "",
+    "description": "A music manager mod",
+    "prefix": "pbra",
+    "author": ["crimsonseraphim"],
+    "main_file": "Penumbra.lua",
+    "priority": -10000,
+    "badge_colour": "FE0001",
+    "dependencies": [
+    ],
+    "conflicts": [
+    ]
+}
